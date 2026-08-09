@@ -48,6 +48,32 @@ OpenCodex-style router modes **`auto-cost`**, **`auto-balance`**, and
 (with an `optimization` ModelParameter for the three variants). Prefer
 `cu/auto` when premium models are out of usage — Auto often still has budget.
 
+## Live catalog is exclusive when synced
+
+After a successful Cursor model sync (HTTP AvailableModels or
+`cursor-agent --list-models` → persisted synced catalog), the **dashboard**,
+**`/v1/models`**, and **Test All** list:
+
+1. Models returned by the live sync
+2. Injected auto-router ids: `auto`, `auto-cost`, `auto-balance`, `auto-intelligence`
+3. Operator **custom** models (Import / manual) — never pruned by sync
+
+The large static registry under
+`open-sse/config/providers/registry/cursor/` is **offline fallback only**. When
+synced is empty (or discovery fails), listing falls back to that registry.
+
+When a requested id is present in the live synced catalog, AgentRun sends that
+id **verbatim** (no `#7289` effort/reasoning strip). Offline / non-catalog ids
+still use the split mapping.
+
+## Helpers
+
+- `providerUsesExclusiveSyncedListing("cursor"|"cu")` —
+  `src/lib/providers/modelListingCapability.ts`
+- `mergeProviderModelListing` — dashboard merge
+- `ensureCursorAutoCatalogEntry` — auto* inject on discovery + listing
+- `shouldSuppressStaticModelForExclusiveListing` — `/v1/models` static loop
+
 ## Provider Limits (quota)
 
 **Usage → Provider Limits** for Cursor uses Bearer APIs on `api2.cursor.sh`
@@ -68,7 +94,9 @@ failures such as `not_found: AI Model Not Found` (usage window exhausted) are
 classified as **Cursor rate limit / usage exceeded** and keep that message
 through the SSE pipeline (the shared empty-stream guard does not overwrite an
 already-emitted error). Check Provider Limits, try model **`auto`**, or raise
-Cursor plan limits.
+Cursor plan limits. Note: rewrite-induced `AI Model Not Found` on live
+effort-suffixed ids is fixed by verbatim wire mapping above — true quota still
+surfaces as usage errors.
 
 ## Client version (headless)
 

@@ -382,6 +382,8 @@ function resolveGrokRequestedModel(
 /**
  * cursor-agent rewrites model ids before putting them on the wire:
  *   "auto"                 → RequestedModel { model_id: "default" }
+ *   "auto-cost"            → RequestedModel { model_id: "default",
+ *                                             parameters: [{id: "optimization", value: "cost"}] }
  *   "composer-2-fast"      → RequestedModel { model_id: "composer-2",
  *                                             parameters: [{id: "fast", value: "true"}] }
  *   "claude-opus-4-8-high" → RequestedModel { model_id: "claude-opus-4-8",
