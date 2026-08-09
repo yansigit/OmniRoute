@@ -406,7 +406,21 @@ export type CursorRoutingLevel = (typeof CURSOR_ROUTING_LEVELS)[number];
  */
 export const CURSOR_ROUTING_LEVEL_PARAMETER_ID = "optimization";
 
-export function resolveRequestedModel(modelId: string): {
+export type ResolveRequestedModelOptions = {
+  /**
+   * When set and containing the normalized client model id, send that id
+   * verbatim on AgentRun (skip composer-fast / grok / Claude / GPT splits).
+   * Live AvailableModels returns flattened effort-suffixed ids; stripping them
+   * to a missing base causes Cursor `AI Model Not Found`. Auto / auto-* still
+   * map to wire `default` (+ optimization) even when present in this set.
+   */
+  liveCatalogIds?: ReadonlySet<string>;
+};
+
+export function resolveRequestedModel(
+  modelId: string,
+  opts?: ResolveRequestedModelOptions
+): {
   modelId: string;
   parameters: Array<{ id: string; value: string }>;
 } {
@@ -423,6 +437,10 @@ export function resolveRequestedModel(modelId: string): {
         parameters: [{ id: CURSOR_ROUTING_LEVEL_PARAMETER_ID, value: level }],
       };
     }
+  }
+  // Live catalog is authoritative for exact ids (flattened effort variants).
+  if (opts?.liveCatalogIds?.has(normalized)) {
+    return { modelId: normalized, parameters: [] };
   }
   // Strip the "-fast" suffix and surface it as a parameter — only the composer
   // family observably needs this split today, but the protocol field is generic.
@@ -483,6 +501,8 @@ export type AgentRunInput = {
   // SelectedContext.selected_images[] (see encodeSelectedImageBody). Empty /
   // undefined keeps the request byte-identical to the text-only path.
   images?: EncodedImage[];
+  /** Exact live AvailableModels ids — see resolveRequestedModel liveCatalogIds. */
+  liveCatalogIds?: ReadonlySet<string>;
 };
 
 /**
@@ -554,7 +574,9 @@ export function openAIToolsToMcpDefs(tools: OpenAITool[]): McpToolDefinition[] {
 export function encodeAgentRunRequest(input: AgentRunInput): Buffer {
   const conversationId = input.conversationId || crypto.randomUUID();
   const messageId = input.messageId || crypto.randomUUID();
-  const { modelId, parameters } = resolveRequestedModel(input.modelId);
+  const { modelId, parameters } = resolveRequestedModel(input.modelId, {
+    liveCatalogIds: input.liveCatalogIds,
+  });
 
   // UserMessage { text, message_id, selected_context, mode=1 }.
   // selected_context is normally an empty placeholder (required by the server
