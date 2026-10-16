@@ -272,6 +272,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
+          retention-days: 7
           name: quality-ratchet
           path: .artifacts/quality-ratchet.md
           if-no-files-found: warn
@@ -567,6 +568,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
+          retention-days: 7
           name: i18n-results
           path: i18n-results/
 
@@ -808,6 +810,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
+          retention-days: 7
           name: coverage-shard-${{ matrix.shard }}
           path: coverage-shard/*.json
           if-no-files-found: error
@@ -988,6 +991,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
+          retention-days: 7
           name: coverage-report
           path: |
             coverage/coverage-summary.json

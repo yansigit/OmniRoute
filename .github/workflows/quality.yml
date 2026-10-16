@@ -252,7 +252,7 @@ jobs:
             forgotten-sibling-tests.md
             forgotten-sibling-tests.json
           if-no-files-found: ignore
-          retention-days: 30
+          retention-days: 7
       # Quality gates (all, non-fail-fast) — #8542: replaces 17 bare check:* steps,
       # 6 G0 gates, 4 ratchet gates, and 3 typecheck steps with a single aggregation
       # step. Each gate runs in a loop with ::group::; failures are collected and
@@ -404,7 +404,7 @@ jobs:
           name: tia-selection
           path: tia-selection.txt
           if-no-files-found: ignore
-          retention-days: 30
+          retention-days: 7
 
   fast-vitest:
     name: Vitest (fast-path)

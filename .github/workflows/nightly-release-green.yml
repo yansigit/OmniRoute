@@ -200,6 +200,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
+          retention-days: 7
           name: release-green-report
           path: |
             release-green.json
@@ -298,6 +299,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
+          retention-days: 7
           name: main-green-report
           path: |
             main-green.json

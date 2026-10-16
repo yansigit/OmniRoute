@@ -131,7 +131,7 @@ jobs:
           name: mutation-report-${{ matrix.batch.name }}
           path: reports/mutation/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
 
   # Aggregation gate (T3): each split batch emits a PARTIAL view of a mutated file
   # (auth.ts lives in a1+a2, accountFallback in b1+b2), so a PER-BATCH ratchet would
