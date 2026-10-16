@@ -32,4 +32,4 @@ jobs:
         with:
           name: semgrep-sarif
           path: semgrep.sarif
-          retention-days: 14
+          retention-days: 7

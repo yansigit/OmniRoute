@@ -238,6 +238,7 @@ jobs:
         if: steps.resolve.outputs.skip != 'true'
         uses: actions/upload-artifact@v7
         with:
+          retention-days: 7
           name: sbom-npm
           path: sbom-npm.cdx.json
           if-no-files-found: error

@@ -60,4 +60,4 @@ jobs:
           name: mutation-nobail-${{ matrix.batch.name }}
           path: reports/mutation/
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
